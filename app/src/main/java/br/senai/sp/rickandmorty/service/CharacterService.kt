@@ -9,5 +9,5 @@ interface CharacterService {
 
     @GET("character/{id}")
     fun getCharacterById(@Path("id") id: Int): Call<Character>
-    
+
 }
