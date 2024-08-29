@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -26,12 +27,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.senai.sp.rickandmorty.service.RetrofitFactory
 import br.senai.sp.rickandmorty.ui.theme.RickAndMortyTheme
 import coil.compose.AsyncImage
 import org.jetbrains.annotations.Async
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import br.senai.sp.rickandmorty.model.Character
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +57,10 @@ fun CharacterDetails(modifier: Modifier = Modifier){
         mutableStateOf("")
     }
 
+    var character by remember {
+        mutableStateOf(Character())
+    }
+
     Surface(
         modifier = modifier
             .fillMaxSize()
@@ -63,13 +73,34 @@ fun CharacterDetails(modifier: Modifier = Modifier){
                 modifier = modifier
                     .fillMaxWidth(),
                 value = id,
-                onValueChange = {},
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                onValueChange = {
+                    id = it
+                },
                 trailingIcon = {
                     IconButton(
                         onClick = {
                             val callCharacter = RetrofitFactory()
                                 .getCharacterService()
-                                .getCharacterById(2)
+                                .getCharacterById(id.toInt())
+
+                            callCharacter.enqueue(object : Callback<Character>{
+                                override fun onResponse(
+                                    call: Call<Character>,
+                                    response: Response<Character>
+                                ) {
+                                    character = response.body()!!
+                                }
+
+                                override fun onFailure(
+                                    call: Call<Character>,
+                                    response: Throwable
+                                ) {
+                                    TODO("Not yet implemented")
+                                }
+                            } )
                         }
                     ) {
                         Icon(
@@ -85,13 +116,13 @@ fun CharacterDetails(modifier: Modifier = Modifier){
                     .size(100.dp)
             ) {
                 AsyncImage(
-                    model = "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
+                    model = character.image,
                     contentDescription = "",
                 )
             }
-            Text(text = "Nome")
-            Text(text = "Espécie:")
-            Text(text = "Origem:")
+            Text(text = "Nome: ${character.name}")
+            Text(text = "Espécie: ${character.species}")
+            Text(text = "Origem: ${character.origin.name}")
         }
     }
 }
