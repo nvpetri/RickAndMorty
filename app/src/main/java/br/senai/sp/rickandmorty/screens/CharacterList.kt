@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import br.senai.sp.rickandmorty.model.Character
 import br.senai.sp.rickandmorty.model.Results
 import br.senai.sp.rickandmorty.service.RetrofitFactory
@@ -39,7 +40,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 @Composable
-fun CharacterList(modifier: Modifier = Modifier) {
+fun CharacterList(controleDeNavegacao: NavController) {
 
     var charactersList by remember {
         mutableStateOf(listOf<Character>())
@@ -84,8 +85,8 @@ fun CharacterList(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn {
-                items(charactersList){
-                    CharacterCard(it)
+                items(charactersList){ character ->
+                    CharacterCard(character, controleDeNavegacao)
                 }
             }
         }
@@ -93,7 +94,7 @@ fun CharacterList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CharacterCard(character: Character) {
+fun CharacterCard(character: Character, controleDeNavegacao: NavController) {
     val context = LocalContext.current
     Card (
         modifier = Modifier
@@ -101,7 +102,7 @@ fun CharacterCard(character: Character) {
             .fillMaxWidth()
             .height(110.dp)
             .clickable{
-                Toast.makeText(context, character.id.toString(), Toast.LENGTH_SHORT).show()
+                controleDeNavegacao.navigate("characterDetails/${character.id}")
             },
         colors = CardDefaults.cardColors(containerColor = Color(0xff00b7ff))
     ) {
@@ -146,16 +147,4 @@ fun CharacterCard(character: Character) {
             }
         }
     }
-}
-
-//@Preview
-//@Composable
-//private fun CharacterPreview() {
-  //  CharacterCard()
-//}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun CharacterPrev() {
-    CharacterList()
 }

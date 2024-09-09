@@ -3,6 +3,9 @@ package br.senai.sp.rickandmorty
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import br.senai.sp.rickandmorty.ui.theme.RickAndMortyTheme
 import br.senai.sp.rickandmorty.screens.CharacterDetails
 import br.senai.sp.rickandmorty.screens.CharacterList
@@ -13,7 +16,24 @@ class MainActivity : ComponentActivity() {
         //enableEdgeToEdge()
         setContent {
             RickAndMortyTheme {
-                CharacterList()
+                val controleDeNavegacao = rememberNavController()
+
+                NavHost(
+                    navController = controleDeNavegacao,
+                    startDestination = "characterList"
+                )
+                {
+                    composable("characterList") {
+                        CharacterList(controleDeNavegacao)
+                    }
+                    composable(
+                        route = "characterDetails/{id}"
+                    ) { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id")
+                        CharacterDetails(controleDeNavegacao, id)
+                    }
+
+                }
             }
         }
     }
