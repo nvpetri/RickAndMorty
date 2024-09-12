@@ -1,6 +1,5 @@
 package br.senai.sp.rickandmorty.screens
 
-
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
